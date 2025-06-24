@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,8 @@ import PersonalInfoStep from "./registration/PersonalInfoStep";
 import DocumentsStep from "./registration/DocumentsStep";
 import ReviewStep from "./registration/ReviewStep";
 import ConfirmationStep from "./registration/ConfirmationStep";
+import { submitApplication } from "@/services/applicationService";
+import { toast } from "@/hooks/use-toast";
 
 interface RegistrationFormProps {
   onBack: () => void;
@@ -36,6 +37,8 @@ export interface FormData {
 
 const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [referenceNumber, setReferenceNumber] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     personalInfo: {
       firstName: "",
@@ -85,6 +88,28 @@ const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
     }));
   };
 
+  const handleSubmitApplication = async () => {
+    setIsSubmitting(true);
+    try {
+      const refNumber = await submitApplication(formData);
+      setReferenceNumber(refNumber);
+      toast({
+        title: "Application submitted successfully!",
+        description: "Your Smart ID registration is being processed securely",
+      });
+      setCurrentStep(4);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        title: "Submission failed",
+        description: error instanceof Error ? error.message : "An error occurred while submitting your application",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -108,12 +133,39 @@ const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
         return (
           <ReviewStep
             data={formData}
-            onNext={nextStep}
+            onNext={handleSubmitApplication}
             onPrev={prevStep}
+            isSubmitting={isSubmitting}
           />
         );
       case 4:
-        return <ConfirmationStep onStartOver={() => setCurrentStep(1)} />;
+        return <ConfirmationStep 
+          onStartOver={() => {
+            setCurrentStep(1);
+            setReferenceNumber(null);
+            setFormData({
+              personalInfo: {
+                firstName: "",
+                lastName: "",
+                dateOfBirth: "",
+                nationality: "",
+                idNumber: "",
+                email: "",
+                phone: "",
+                address: "",
+                city: "",
+                postalCode: "",
+              },
+              documents: {
+                photoId: null,
+                proofOfAddress: null,
+                photograph: null,
+                birthCertificate: null,
+              },
+            });
+          }}
+          referenceNumber={referenceNumber}
+        />;
       default:
         return null;
     }

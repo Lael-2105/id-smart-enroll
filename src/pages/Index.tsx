@@ -2,11 +2,29 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { IdCard, UserRound } from "lucide-react";
+import { IdCard, UserRound, LogOut } from "lucide-react";
 import RegistrationForm from "@/components/RegistrationForm";
+import Auth from "@/components/Auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const [showRegistration, setShowRegistration] = useState(false);
+  const { user, loading, signOut } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   if (showRegistration) {
     return <RegistrationForm onBack={() => setShowRegistration(false)} />;
@@ -17,13 +35,27 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <IdCard className="h-8 w-8 text-white" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <IdCard className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Smart ID Portal</h1>
+                <p className="text-sm text-gray-600">Digital Identity Registration System</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Smart ID Portal</h1>
-              <p className="text-sm text-gray-600">Digital Identity Registration System</p>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">Welcome, {user.email}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="flex items-center space-x-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </Button>
             </div>
           </div>
         </div>

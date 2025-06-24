@@ -5,10 +5,11 @@ import { CheckCircle, Download, Mail, Phone } from "lucide-react";
 
 interface ConfirmationStepProps {
   onStartOver: () => void;
+  referenceNumber: string | null;
 }
 
-const ConfirmationStep = ({ onStartOver }: ConfirmationStepProps) => {
-  const referenceNumber = `SID-${Date.now().toString().slice(-8)}`;
+const ConfirmationStep = ({ onStartOver, referenceNumber }: ConfirmationStepProps) => {
+  const displayReferenceNumber = referenceNumber || `SID-${Date.now().toString().slice(-8)}`;
 
   return (
     <div className="text-center">
@@ -23,12 +24,13 @@ const ConfirmationStep = ({ onStartOver }: ConfirmationStepProps) => {
       </div>
 
       <Card className="p-8 mb-8 bg-blue-50 border-blue-200">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Reference Number</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Secure Reference Number</h3>
         <div className="bg-white p-4 rounded-lg border border-blue-300 mb-4">
-          <p className="text-2xl font-mono font-bold text-blue-600">{referenceNumber}</p>
+          <p className="text-2xl font-mono font-bold text-blue-600">{displayReferenceNumber}</p>
         </div>
         <p className="text-sm text-gray-700">
-          Please save this reference number. You'll need it to track your application status.
+          This cryptographically secure reference number has been generated for your application. 
+          Keep it safe - you'll need it to track your application status.
         </p>
       </Card>
 

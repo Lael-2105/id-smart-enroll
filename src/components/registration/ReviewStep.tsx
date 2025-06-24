@@ -1,30 +1,17 @@
-
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, FileText } from "lucide-react";
+import { CheckCircle, FileText, Loader2 } from "lucide-react";
 import { FormData } from "../RegistrationForm";
-import { toast } from "@/hooks/use-toast";
 
 interface ReviewStepProps {
   data: FormData;
   onNext: () => void;
   onPrev: () => void;
+  isSubmitting?: boolean;
 }
 
-const ReviewStep = ({ data, onNext, onPrev }: ReviewStepProps) => {
-  const handleSubmit = () => {
-    // Simulate API call
-    toast({
-      title: "Application submitted successfully!",
-      description: "Your Smart ID registration is being processed",
-    });
-    
-    setTimeout(() => {
-      onNext();
-    }, 1000);
-  };
-
+const ReviewStep = ({ data, onNext, onPrev, isSubmitting = false }: ReviewStepProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -127,11 +114,23 @@ const ReviewStep = ({ data, onNext, onPrev }: ReviewStepProps) => {
       <Separator className="my-8" />
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onPrev} size="lg" className="px-8">
+        <Button variant="outline" onClick={onPrev} size="lg" className="px-8" disabled={isSubmitting}>
           Previous
         </Button>
-        <Button onClick={handleSubmit} size="lg" className="px-8 bg-green-600 hover:bg-green-700">
-          Submit Application
+        <Button 
+          onClick={onNext} 
+          size="lg" 
+          className="px-8 bg-green-600 hover:bg-green-700"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting Securely...
+            </>
+          ) : (
+            'Submit Application'
+          )}
         </Button>
       </div>
     </div>
